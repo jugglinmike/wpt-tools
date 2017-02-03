@@ -153,6 +153,31 @@ def test_lint_failing(capsys):
     assert err == ""
 
 
+def test_ref_existent(capsys):
+    with _mock_lint("check_path") as mocked_check_path:
+        with _mock_lint("check_file_contents") as mocked_check_file_contents:
+            rv = lint(_dummy_repo, ["ref/existent.html"], False, False)
+            assert rv == 0
+            assert mocked_check_path.call_count == 1
+            assert mocked_check_file_contents.call_count == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
+
+
+def test_ref_non_existent(capsys):
+    with _mock_lint("check_path") as mocked_check_path:
+        with _mock_lint("check_file_contents") as mocked_check_file_contents:
+            rv = lint(_dummy_repo, ["ref/non_existent.html"], False, False)
+            assert rv == 1
+            assert mocked_check_path.call_count == 1
+            assert mocked_check_file_contents.call_count == 1
+    out, err = capsys.readouterr()
+    assert "NON-EXISTENT-REF" in out
+    assert "ref/non_existent.html" in out
+    assert err == ""
+
+
 def test_lint_passing_and_failing(capsys):
     with _mock_lint("check_path") as mocked_check_path:
         with _mock_lint("check_file_contents") as mocked_check_file_contents:
