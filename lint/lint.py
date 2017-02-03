@@ -226,6 +226,17 @@ def check_parsed(repo_root, path, f, css_mode):
     if source_file.type == "visual" and not source_file.name_is_visual:
         return [("CONTENT-VISUAL", "Visual test whose filename doesn't end in '-visual'", path, None)]
 
+    for reftest_node in source_file.reftest_nodes:
+        href = reftest_node.attrib.get("href", "")
+        reference_file = os.path.join(source_file.dir_path, href)
+        reference_rel = reftest_node.attrib.get("rel", "")
+
+        if reference_rel not in ("match", "mismatch"):
+            return [("INVALID-REF", "Reference test with an invalid relationship type: '%s'" % reference_rel, path, None)]
+
+        if not os.path.isfile(reference_file):
+            return [("NON-EXISTENT-REF", "Reference test with a non-existent %s relationship reference: '%s'" % (reference_rel, href), path, None)]
+
     if len(source_file.timeout_nodes) > 1:
         errors.append(("MULTIPLE-TIMEOUT", "More than one meta name='timeout'", path, None))
 
