@@ -48,29 +48,6 @@ def test_trailing_whitespace():
         assert errors == expected
 
 
-#def test_non_existent_rel():
-#    error_map = check_with_files(b"""
-#        <link rel='match' href='dsfds'>
-#        <link rel='match' href='dsfds'>
-#    """)
-#
-#    for (filename, (errors, kind)) in error_map.items():
-#        check_errors(errors)
-#
-#        expected = [()]
-#        print errors
-#        if kind in ["web-lax", "web-strict"]:
-#            assert errors == [
-#                ("MULTIPLE-TIMEOUT", "More than one meta name='timeout'", filename, None),
-#                ("INVALID-TIMEOUT", "Invalid timeout value ", filename, None),
-#                ("INVALID-TIMEOUT", "Invalid timeout value short", filename, None),
-#            ]
-#        else:
-#            assert errors == [
-#                ("PARSE-FAILED", "Unable to parse file", filename, 2),
-#            ]
-
-
 def test_indent_tabs():
     error_map = check_with_files(b"def foo():\n\x09pass")
 
