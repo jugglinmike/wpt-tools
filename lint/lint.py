@@ -228,11 +228,20 @@ def check_parsed(repo_root, path, f, css_mode):
 
     for reftest_node in source_file.reftest_nodes:
         href = reftest_node.attrib.get("href", "")
-        reference_file = os.path.join(repo_root, source_file.dir_path, href)
+        path_parts = [repo_root]
+        if href[0] != "/":
+            path_parts.extend([source_file.dir_path, href])
+        else:
+            # Remove the leading "forward-slash" character in root-relative
+            # URLs so that the `os.path.join` does not interpret the value as
+            # an absolute path.
+            path_parts.extend([href[1:]])
+        reference_file = os.path.join(*path_parts)
         reference_rel = reftest_node.attrib.get("rel", "")
 
         if not os.path.isfile(reference_file):
-            return [("NON-EXISTENT-REF", "Reference test with a non-existent '%s' relationship reference: '%s'" % (reference_rel, href), path, None)]
+            return [("NON-EXISTENT-REF",
+                     "Reference test with a non-existent '%s' relationship reference: '%s'" % (reference_rel, href), path, None)]
 
     if len(source_file.timeout_nodes) > 1:
         errors.append(("MULTIPLE-TIMEOUT", "More than one meta name='timeout'", path, None))
