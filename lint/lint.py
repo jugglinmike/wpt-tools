@@ -240,8 +240,8 @@ def check_parsed(repo_root, path, f, css_mode):
         reference_rel = reftest_node.attrib.get("rel", "")
 
         if not os.path.isfile(reference_file):
-            return [("NON-EXISTENT-REF",
-                     "Reference test with a non-existent '%s' relationship reference: '%s'" % (reference_rel, href), path, None)]
+            errors.append(("NON-EXISTENT-REF",
+                     "Reference test with a non-existent '%s' relationship reference: '%s'" % (reference_rel, href), path, None))
 
     if len(source_file.timeout_nodes) > 1:
         errors.append(("MULTIPLE-TIMEOUT", "More than one meta name='timeout'", path, None))
