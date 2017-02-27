@@ -10,7 +10,6 @@ import subprocess
 import sys
 
 from collections import defaultdict
-from urlparse import urlsplit
 
 from . import fnmatch
 from ..localpaths import repo_root
@@ -19,6 +18,7 @@ from ..gitignore.gitignore import PathFilter
 from manifest.sourcefile import SourceFile, meta_re
 from six import binary_type, iteritems, itervalues
 from six.moves import range
+from six.moves.urllib.parse import urlsplit
 
 here = os.path.abspath(os.path.split(__file__)[0])
 
@@ -230,7 +230,7 @@ def check_parsed(repo_root, path, f, css_mode):
     for reftest_node in source_file.reftest_nodes:
         href = reftest_node.attrib.get("href", "")
         parts = urlsplit(href)
-        if len(parts.netloc) is not 0:
+        if len(parts.netloc) is not 0 or len(parts.scheme) is not 0:
             errors.append(("ABSOLUTE-URL-REF",
                      "Reference test with a reference file specified via an absolute URL: '%s'" % href, path, None))
             continue
