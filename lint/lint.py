@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from collections import defaultdict
+from urlparse import urlsplit
 
 from . import fnmatch
 from ..localpaths import repo_root
@@ -228,15 +229,23 @@ def check_parsed(repo_root, path, f, css_mode):
 
     for reftest_node in source_file.reftest_nodes:
         href = reftest_node.attrib.get("href", "")
-        path_parts = [repo_root]
-        if href[0] != "/":
-            path_parts.extend([source_file.dir_path, href])
-        else:
+        parts = urlsplit(href)
+        if len(parts.netloc) is not 0:
+            errors.append(("ABSOLUTE-URL-REF",
+                     "Reference test with a reference file specified via an absolute URL: '%s'" % href, path, None))
+            continue
+
+        ref_path = parts.path
+
+        if ref_path[0] == "/":
             # Remove the leading "forward-slash" character in root-relative
-            # URLs so that the `os.path.join` does not interpret the value as
-            # an absolute path.
-            path_parts.extend([href[1:]])
-        reference_file = os.path.join(*path_parts)
+            # URLs so that the `os.path.join` method does not interpret the
+            # value as an absolute path.
+            ref_path = ref_path[1:]
+        else:
+            ref_path = source_file.dir_path + "/" + ref_path
+
+        reference_file = os.path.join(repo_root, ref_path)
         reference_rel = reftest_node.attrib.get("rel", "")
 
         if not os.path.isfile(reference_file):
